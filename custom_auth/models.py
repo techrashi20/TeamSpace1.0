@@ -4,13 +4,14 @@ from django.utils.crypto import get_random_string
 
 class UserProfile(models.Model):
     ROLE_CHOICES = (
+        ('ADMIN', 'Admin'),
         ('EMPLOYEE', 'Employee'),
         ('CLIENT', 'Client'),
         ('CUSTOMER', 'Customer'),
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='CUSTOMER')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='EMPLOYEE')
     
     # Verification and Authentication
     is_email_verified = models.BooleanField(default=False)
