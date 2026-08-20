@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-sm">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Drafts</h1>
+    <div class="space-y-2">
+        {% for draft in drafts %}
+            <div class="flex justify-between items-center border p-3 rounded hover:bg-gray-50">
+                <div>
+                    <a href="{% url 'edit_draft' draft.id %}" class="font-semibold text-indigo-600 hover:underline">{{ draft.subject }}</a>
+                    <p class="text-xs text-gray-500">{{ draft.body|truncatewords:10 }}</p>
+                </div>
+                <span class="text-xs text-gray-400">{{ draft.timestamp|date:"M d, H:i" }}</span>
+            </div>
+        {% empty %}
+            <p class="text-gray-500 text-sm">No saved drafts.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

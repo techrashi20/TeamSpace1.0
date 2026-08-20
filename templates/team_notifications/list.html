@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 0 auto;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+        <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">Notifications</h2>
+        <button onclick="markAllAsRead()" style="background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #475569; cursor: pointer;">
+            Mark all as read
+        </button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for notif in notifications %}
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 18px; background-color: {% if not notif.is_read %}#eff6ff{% else %}#ffffff{% endif %}; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 4px;">
+                        {{ notif.title }}
+                    </div>
+                    <div style="font-size: 13px; color: #475569; margin-bottom: 6px;">
+                        {{ notif.message }}
+                    </div>
+                    <div style="font-size: 11px; color: #94a3b8;">
+                        {{ notif.created_at|date:"M d, Y H:i" }}
+                    </div>
+                </div>
+                <div>
+                    {% if not notif.is_read %}
+                        <a href="{% url 'mark_notification_read' notif.id %}" style="font-size: 12px; color: #2563eb; text-decoration: none; font-weight: 600;">View &rarr;</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div style="padding: 48px; text-align: center; color: #94a3b8;">
+                <p style="font-size: 14px; font-weight: 500; margin: 0;">No notifications found.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script>
+    function markAllAsRead() {
+        fetch("{% url 'mark_all_read_api' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        }).then(res => {
+            if(res.ok) {
+                location.reload();
+            }
+        });
+    }
+</script>
+{% endblock %}

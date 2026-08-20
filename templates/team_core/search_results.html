@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-sm">
+    <h1 class="text-xl font-bold text-gray-800 mb-4">Search Results for "{{ query }}"</h1>
+
+    <div class="space-y-6">
+        <!-- Tasks Results -->
+        <div>
+            <h2 class="font-bold text-md text-gray-700 border-b pb-1 mb-2">Tasks ({{ tasks|length }})</h2>
+            {% for task in tasks %}
+                <a href="{% url 'task_detail' task.pk %}" class="block p-3 border rounded mb-2 hover:bg-gray-50">
+                    <p class="font-semibold text-indigo-600">{{ task.title }}</p>
+                    <p class="text-xs text-gray-500">{{ task.description|truncatewords:15 }}</p>
+                </a>
+            {% empty %}
+                <p class="text-xs text-gray-400">No matching tasks found.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Mail Results -->
+        <div>
+            <h2 class="font-bold text-md text-gray-700 border-b pb-1 mb-2">Mail Threads ({{ messages|length }})</h2>
+            {% for msg in messages %}
+                <a href="{% url 'message_detail' msg.pk %}" class="block p-3 border rounded mb-2 hover:bg-gray-50">
+                    <p class="font-semibold text-indigo-600">{{ msg.subject }}</p>
+                    <p class="text-xs text-gray-500">{{ msg.body|truncatewords:15 }}</p>
+                </a>
+            {% empty %}
+                <p class="text-xs text-gray-400">No matching messages found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

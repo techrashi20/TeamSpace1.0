@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 440px; margin: 40px auto; padding: 30px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: system-ui, -apple-system, sans-serif;">
+    
+    <h2 style="font-size: 24px; font-weight: 700; color: #1f2937; margin-top: 0; margin-bottom: 8px; text-align: center;">Create New Account</h2>
+    <p style="font-size: 13px; color: #6b7280; text-align: center; margin-bottom: 24px;">Register as a Client or Customer</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; background-color: #fee2e2; color: #991b1b;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+        
+        <!-- Account Type / Role Dropdown -->
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">
+                Account Type
+            </label>
+            <select name="role" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #374151; background-color: #fff; box-sizing: border-box; outline: none;">
+                <option value="" disabled selected>Select Role (Client or Customer)</option>
+                <option value="CLIENT">Client</option>
+                <option value="CUSTOMER">Customer</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">Username</label>
+            <input type="text" name="username" required placeholder="Enter username"
+                style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #1f2937; box-sizing: border-box; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">Email Address</label>
+            <input type="email" name="email" required placeholder="name@example.com"
+                style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #1f2937; box-sizing: border-box; outline: none;">
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div style="flex: 1;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">First Name</label>
+                <input type="text" name="first_name" placeholder="First Name"
+                    style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #1f2937; box-sizing: border-box; outline: none;">
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">Last Name</label>
+                <input type="text" name="last_name" placeholder="Last Name"
+                    style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #1f2937; box-sizing: border-box; outline: none;">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">Password</label>
+            <input type="password" name="password" required placeholder="••••••••"
+                style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #1f2937; box-sizing: border-box; outline: none;">
+        </div>
+
+        <button type="submit" 
+            style="width: 100%; padding: 11px; background-color: #4f46e5; color: #ffffff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+            Register
+        </button>
+    </form>
+
+    <div style="margin-top: 20px; text-align: center; font-size: 13px; color: #6b7280;">
+        Already registered? <a href="{% url 'login' %}" style="color: #4f46e5; font-weight: 600; text-decoration: none;">Login here</a>
+    </div>
+</div>
+{% endblock %}

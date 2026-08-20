@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-6">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Login to TeamSpace</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+            <input type="text" name="username" class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+            <input type="password" name="password" class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div class="flex items-center justify-between mb-6">
+            <label class="flex items-center text-sm text-gray-600">
+                <input type="checkbox" name="remember_me" class="mr-2"> Save Session / Remember Me
+            </label>
+            <a href="{% url 'forgot_password' %}" class="text-xs text-indigo-600 hover:underline">Forgot Password?</a>
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded transition mb-4">Sign In</button>
+        <p class="text-xs text-center text-gray-600">Don't have an account? <a href="{% url 'register' %}" class="text-indigo-600 font-semibold hover:underline">Create New User</a></p>
+    </form>
+</div>
+{% endblock %}

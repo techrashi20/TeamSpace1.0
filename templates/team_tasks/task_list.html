@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 30px auto; padding: 25px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); font-family: system-ui, -apple-system, sans-serif;">
+    
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <h2 style="font-size: 22px; font-weight: 700; color: #1f2937; margin: 0;">Task Management</h2>
+            <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">View and track all assigned team tasks</p>
+        </div>
+        
+        <!-- Filter Controls -->
+        <form method="GET" action="" style="display: flex; align-items: center; gap: 10px;">
+            <label for="sort" style="font-size: 14px; font-weight: 600; color: #374151;">Sort By:</label>
+            <select name="sort" id="sort" onchange="this.form.submit()" 
+                style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #374151; background-color: #ffffff; cursor: pointer; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <option value="">Default (Date Created)</option>
+                <option value="priority" {% if current_sort == 'priority' %}selected{% endif %}>Priority (High → Low)</option>
+            </select>
+        </form>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #e5e7eb; margin-bottom: 20px;">
+
+    <!-- Tasks Table -->
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <thead>
+                <tr style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                    <th style="padding: 12px 16px; font-weight: 600; color: #4b5563;">Task Title</th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: #4b5563;">Priority</th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: #4b5563;">Assigned To</th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: #4b5563;">Due Date</th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: #4b5563;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                    <tr style="border-bottom: 1px solid #f3f4f6;" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='transparent'">
+                        <!-- Title & Description -->
+                        <td style="padding: 14px 16px; vertical-align: top;">
+                            <strong style="color: #1f2937; display: block; margin-bottom: 2px;">{{ task.title }}</strong>
+                            {% if task.description %}
+                                <span style="color: #6b7280; font-size: 12px; display: block;">{{ task.description|truncatewords:10 }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Priority Badge -->
+                        <td style="padding: 14px 16px; vertical-align: top;">
+                            {% if task.priority == 'High' %}
+                                <span style="display: inline-block; padding: 3px 10px; font-size: 12px; font-weight: 600; color: #991b1b; background-color: #fee2e2; border-radius: 12px;">
+                                    High
+                                </span>
+                            {% elif task.priority == 'Medium' %}
+                                <span style="display: inline-block; padding: 3px 10px; font-size: 12px; font-weight: 600; color: #854d0e; background-color: #fef9c3; border-radius: 12px;">
+                                    Medium
+                                </span>
+                            {% else %}
+                                <span style="display: inline-block; padding: 3px 10px; font-size: 12px; font-weight: 600; color: #166534; background-color: #dcfce7; border-radius: 12px;">
+                                    Low
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Assignee -->
+                        <td style="padding: 14px 16px; vertical-align: top; color: #374151;">
+                            {{ task.assigned_to.username|default:"Unassigned" }}
+                        </td>
+
+                        <!-- Due Date -->
+                        <td style="padding: 14px 16px; vertical-align: top; color: #6b7280; font-size: 13px;">
+                            {{ task.due_date|date:"M d, Y"|default:"No Limit" }}
+                        </td>
+
+                        <!-- Status -->
+                        <td style="padding: 14px 16px; vertical-align: top;">
+                            {% if task.is_completed %}
+                                <span style="color: #059669; font-weight: 600; font-size: 13px;">✓ Completed</span>
+                            {% else %}
+                                <span style="color: #d97706; font-weight: 600; font-size: 13px;">⏳ Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" style="padding: 30px; text-align: center; color: #9ca3af; font-size: 14px;">
+                            No tasks found matching the criteria.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

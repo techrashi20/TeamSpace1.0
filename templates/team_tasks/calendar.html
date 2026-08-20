@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Task Deadlines - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 0 auto;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+        <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">Task Deadlines & Schedule</h2>
+        <a href="{% url 'task_board' %}" style="font-size: 13px; color: #2563eb; text-decoration: none; font-weight: 600;">&larr; Back to Task Board</a>
+    </div>
+
+    <!-- Timeline / Schedule List -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for task in tasks %}
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: white; border: 1px solid #e2e8f0; border-radius: 10px; border-left: 4px solid {% if task.status == 'COMPLETED' %}#22c55e{% elif task.status == 'IN_PROGRESS' %}#fbbf24{% else %}#94a3b8{% endif %};">
+                <div>
+                    <div style="font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 4px;">
+                        {{ task.title }}
+                    </div>
+                    <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">
+                        {{ task.description|truncatechars:60 }}
+                    </div>
+                    <span style="font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; background: #f1f5f9; color: #475569;">
+                        Status: {{ task.get_status_display }}
+                    </span>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11px; color: #94a3b8; font-weight: 500; margin-bottom: 2px;">Due Date</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #ef4444;">
+                        {{ task.due_date|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div style="padding: 48px; text-align: center; color: #94a3b8; background: white; border: 1px solid #e2e8f0; border-radius: 10px;">
+                <p style="font-size: 14px; font-weight: 500; margin: 0;">No scheduled tasks with deadlines found.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TeamSpace Portal{% endblock %}</title>
+    <style>
+        /* Responsive container adjustments */
+        @media (max-width: 768px) {
+            .container[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+                height: auto !important;
+            }
+        }
+            
+        /* Dashboard grid adjustment for mobile */
+        div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* Chat box height adjustment for mobile screens */
+        #chat-box {
+            height: 65vh !important;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #334155;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .brand-logo {
+            font-size: 20px;
+            font-weight: 800;
+            color: #4f46e5;
+            margin-bottom: 32px;
+            padding-left: 12px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .nav-item.active a {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            font-weight: 600;
+        }
+
+        /* Admin link highlight style */
+        .nav-item.admin-panel-item a {
+            color: #4f46e5;
+            background-color: #f5f3ff;
+            font-weight: 600;
+            border: 1px dashed #c7d2fe;
+        }
+
+        .nav-item.admin-panel-item a:hover {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            color: #ffffff;
+        }
+
+        .badge-inbox { background-color: #ef4444; }
+        .badge-tasks { background-color: #f59e0b; }
+        .badge-notifications { background-color: #6366f1; }
+
+        .user-profile-section {
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: capitalize;
+        }
+
+        .logout-btn {
+            font-size: 13px;
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .main-wrapper {
+            margin-left: 260px;
+            flex-grow: 1;
+            padding: 32px;
+            max-width: 1200px;
+        }
+
+        .container {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    {% if user.is_authenticated %}
+    <aside class="sidebar">
+        <a href="{% url 'inbox' %}" class="brand-logo">
+            TeamSpace
+        </a>
+
+        <ul class="nav-menu">
+            <!-- Dashboard Link -->
+            <li class="nav-item {% if active_tab == 'dashboard' %}active{% endif %}">
+                <a href="{% url 'dashboard' %}" class="nav-link">
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item {% if active_tab == 'inbox' %}active{% endif %}">
+                <a href="{% url 'inbox' %}">
+                    <span>Inbox</span>
+                    {% if unread_inbox_count %}
+                        <span class="badge badge-inbox">{{ unread_inbox_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+
+            <li class="nav-item {% if active_tab == 'sent' %}active{% endif %}">
+                <a href="{% url 'sent' %}">
+                    <span>Sent</span>
+                </a>
+            </li>
+
+            <li class="nav-item {% if active_tab == 'drafts' %}active{% endif %}">
+                <a href="{% url 'drafts' %}">
+                    <span>Drafts</span>
+                </a>
+            </li>
+
+            <li class="nav-item {% if active_tab == 'archive' %}active{% endif %}">
+                <a href="{% url 'archive' %}">
+                    <span>Archive</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="{% url 'task_board' %}">
+                    <span>Tasks</span>
+                    {% if unread_tasks_count %}
+                        <span class="badge badge-tasks">{{ unread_tasks_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="nav-item {% if active_tab == 'chat' %}active{% endif %}">
+                <a href="{% url 'chat_main' %}">
+                    <span>Team Chat</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'notifications_list' %}">
+                    <span>Notifications</span>
+                    {% if unread_notifications_count %}
+                        <span class="badge badge-notifications">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="nav-item {% if active_tab == 'calendar' %}active{% endif %}">
+                <a href="{% url 'task_calendar' %}">
+                    <span>Calendar</span>
+                </a>
+            </li>
+
+            <!-- Superuser Admin Panel Access -->
+            {% if user.is_superuser %}
+            <li class="nav-item admin-panel-item" style="margin-top: auto; margin-bottom: 12px;">
+                <a href="/admin/" target="_blank">
+                    <span>Admin Panel</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+
+        <div class="user-profile-section">
+            <div class="user-info">
+                <span class="user-name">{{ user.username }}</span>
+                <span class="user-role">
+                    {% if user.is_superuser %}
+                        Super Admin
+                    {% elif user.profile %}
+                        {{ user.profile.get_role_display }}
+                    {% else %}
+                        Member
+                    {% endif %}
+                </span>
+            </div>
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </div>
+    </aside>
+    {% endif %}
+
+    <main class="main-wrapper" style="{% if not user.is_authenticated %}margin-left: 0; width: 100%;{% endif %}">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

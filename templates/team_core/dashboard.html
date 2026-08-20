@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+    <h2 style="margin-bottom: 24px; color: #1e293b; font-size: 24px; font-weight: 700;">Team Dashboard</h2>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+        
+        <!-- Chart Section -->
+        <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <h3 style="font-size: 16px; font-weight: 600; color: #334155; margin-bottom: 15px;">My Tasks Progress</h3>
+            <div style="position: relative; height: 250px; width: 100%;">
+                <canvas id="taskChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Quick Stats & Alerts -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe;">
+                <h4 style="margin: 0; font-size: 14px; color: #1e40af; font-weight: 600;">Unread Emails</h4>
+                <p style="margin: 8px 0 0; font-size: 28px; font-weight: 700; color: #1d4ed8;">{{ unread_mails }}</p>
+            </div>
+            
+            <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <h4 style="font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 12px;">Recent Alerts</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% for n in recent_notifs %}
+                        <div style="font-size: 12px; padding: 8px 10px; background-color: #f8fafc; border-radius: 6px; border-left: 3px solid #3b82f6; color: #475569;">
+                            <strong>{{ n.title }}</strong>: {{ n.message|truncatechars:35 }}
+                        </div>
+                    {% empty %}
+                        <p style="font-size: 12px; color: #94a3b8; margin: 0;">No new alerts.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Safely parse task counts from Django query loop
+    let todoCount = 0;
+    let progressCount = 0;
+    let completedCount = 0;
+
+    {% for stat in task_stats %}
+        {% if stat.status == 'TODO' %}
+            todoCount = {{ stat.total }};
+        {% elif stat.status == 'IN_PROGRESS' %}
+            progressCount = {{ stat.total }};
+        {% elif stat.status == 'COMPLETED' %}
+            completedCount = {{ stat.total }};
+        {% endif %}
+    {% endfor %}
+
+    const ctx = document.getElementById('taskChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['To Do', 'In Progress', 'Completed'],
+            datasets: [{
+                label: 'Tasks Count',
+                data: [todoCount, progressCount, completedCount],
+                backgroundColor: ['#94a3b8', '#fbbf24', '#22c55e'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

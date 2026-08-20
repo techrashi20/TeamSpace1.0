@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-sm space-y-6">
+    <div class="border-b pb-4 flex justify-between items-start">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">{{ task.title }}</h1>
+            <p class="text-xs text-gray-500">Created by: {{ task.created_by.username }} | Assigned to: <span class="font-semibold text-gray-700">{{ task.assigned_to.username }}</span></p>
+        </div>
+        <form method="post" action="{% url 'update_task_status' task.pk %}" class="flex items-center space-x-2">
+            {% csrf_token %}
+            <select name="status" class="border text-xs rounded p-1">
+                {% for code, label in task.STATUS_CHOICES %}
+                    <option value="{{ code }}" {% if task.status == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-gray-800 text-white text-xs px-2 py-1 rounded">Update</button>
+        </form>
+    </div>
+
+    <div>
+        <h3 class="text-sm font-semibold text-gray-600 mb-1">Description</h3>
+        <p class="text-gray-800 text-sm leading-relaxed bg-gray-50 p-3 rounded border">{{ task.description }}</p>
+    </div>
+
+    {% if task.source_message %}
+        <div class="bg-indigo-50 border border-indigo-200 p-3 rounded text-xs text-indigo-800">
+            <strong>Source Mail Thread:</strong> <a href="{% url 'message_detail' task.source_message.pk %}" class="underline">{{ task.source_message.subject }}</a>
+        </div>
+    {% endif %}
+
+    <!-- Comments Section -->
+    <div class="border-t pt-4 space-y-4">
+        <h3 class="font-bold text-gray-700">Comments</h3>
+        {% for comment in task.comments.all %}
+            <div class="bg-gray-50 p-3 rounded border text-sm">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span class="font-semibold text-gray-700">{{ comment.author.username }}</span>
+                    <span>{{ comment.created_at|date:"M d, H:i" }}</span>
+                </div>
+                <p class="text-gray-800">{{ comment.comment }}</p>
+            </div>
+        {% empty %}
+            <p class="text-gray-500 text-xs">No comments yet.</p>
+        {% endfor %}
+
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            {{ comment_form.comment }}
+            <button type="submit" class="mt-2 bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700">Add Comment</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

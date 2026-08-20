@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}System Audit Logs - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-sm">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">System Audit Logs</h1>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+            <thead>
+                <tr class="bg-gray-100 border-b">
+                    <th class="p-3">Timestamp</th>
+                    <th class="p-3">User</th>
+                    <th class="p-3">Action</th>
+                    <th class="p-3">Details</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                {% for log in logs %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 text-xs text-gray-500">{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
+                        <td class="p-3 font-semibold text-gray-700">{{ log.user.username|default:"System" }}</td>
+                        <td class="p-3"><span class="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded font-mono">{{ log.action }}</span></td>
+                        <td class="p-3 text-gray-600">{{ log.details }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-gray-500">No activity logs found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

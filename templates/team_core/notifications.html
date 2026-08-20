@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-sm">
+    <h1 class="text-xl font-bold mb-4">Notifications</h1>
+    <p class="text-sm text-green-600 font-semibold mb-4">All notifications marked as read!</p>
+    <a href="{% url 'dashboard' %}" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded">Back to Dashboard</a>
+</div>
+{% endblock %}

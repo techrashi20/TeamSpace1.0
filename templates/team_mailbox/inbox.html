@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title|default:"Inbox" }} - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="container">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+        <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">
+            {{ title|default:"Inbox" }}
+        </h2>
+        <a href="{% url 'compose' %}" 
+            style="background-color: #4f46e5; color: #ffffff; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+            Compose Mail
+        </a>
+    </div>
+
+    {% if messages_alerts %}
+        {% for message in messages_alerts %}
+            <div style="padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; background-color: #e0e7ff; color: #3730a3;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+        
+        {% for msg in messages %}
+            <div style="border-bottom: 1px solid #f1f5f9; background-color: {% if not msg.is_read and active_tab == 'inbox' %}#f0fdf4{% else %}#ffffff{% endif %};">
+                <a href="{% url 'message_detail' msg.id %}" style="text-decoration: none; color: inherit; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px;">
+                    
+                    <div style="display: flex; align-items: center; gap: 16px; flex-grow: 1; overflow: hidden; padding-right: 16px;">
+                        <span style="width: 140px; flex-shrink: 0; font-size: 14px; color: #1e293b; font-weight: {% if not msg.is_read and active_tab == 'inbox' %}700{% else %}500{% endif %}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {% if active_tab == 'sent' %}
+                                To: 
+                                {% for r in msg.recipients.all %}
+                                    {{ r.username }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    No Recipient
+                                {% endfor %}
+                            {% else %}
+                                {{ msg.sender.username }}
+                            {% endif %}
+                        </span>
+
+                        <div style="flex-grow: 1; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <span style="color: #0f172a; font-weight: {% if not msg.is_read and active_tab == 'inbox' %}700{% else %}500{% endif %};">
+                                {{ msg.subject|default:"(No Subject)" }}
+                            </span>
+                            <span style="color: #64748b; font-weight: 400; margin-left: 6px;">
+                                - {{ msg.body|striptags|truncatechars:60 }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+                        {% if not msg.is_read and active_tab == 'inbox' %}
+                            <span style="background-color: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+                                New
+                            </span>
+                        {% endif %}
+                        
+                        <span style="font-size: 12px; color: #94a3b8; font-weight: 500;">
+                            {{ msg.timestamp|date:"M d, H:i" }}
+                        </span>
+                    </div>
+
+                </a>
+            </div>
+        {% empty %}
+            <div style="padding: 48px; text-align: center; color: #94a3b8;">
+                <p style="font-size: 14px; font-weight: 500; margin: 0;">No messages found here.</p>
+            </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Team Chat - TeamSpace{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 260px 1fr; gap: 20px; height: 82vh;">
+    
+    <!-- Left Sidebar: Rooms List & Creator -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0;">Discussion Rooms</h3>
+        
+        <!-- Room Links -->
+        <div style="display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex: 1;">
+            {% for r in rooms_list %}
+                <a href="{% url 'chat_room' r %}" style="padding: 10px 12px; border-radius: 8px; font-size: 14px; text-decoration: none; font-weight: 500; {% if room_name == r %}background: #eff6ff; color: #2563eb; font-weight: 600;{% else %}color: #475569; background: #f8fafc;{% endif %}">
+                    # {{ r }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Create New Room Form -->
+        <form method="POST" style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+            {% csrf_token %}
+            <label style="font-size: 11px; font-weight: 600; color: #64748b;">Create or Join Room</label>
+            <div style="display: flex; gap: 6px;">
+                <input type="text" name="new_room" placeholder="room-name" required style="flex: 1; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none;">
+                <button type="submit" style="background: #0f172a; color: white; border: none; padding: 0 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">Go</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Right Section: Active Chat Area -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box;">
+        
+        <!-- Room Header -->
+        <div style="padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">Active Room: <span style="color: #2563eb;">#{{ room_name }}</span></h2>
+        </div>
+
+        <!-- Chat Messages Box -->
+        <div id="chat-box" style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+            {% for chat in messages %}
+                <div style="max-width: 75%; padding: 10px 14px; border-radius: 10px; {% if chat.sender == request.user %}background: #2563eb; color: white; align-self: flex-end;{% else %}background: white; color: #1e293b; border: 1px solid #e2e8f0; align-self: flex-start;{% endif %}">
+                    <div style="font-size: 11px; font-weight: 600; opacity: 0.8; margin-bottom: 2px;">
+                        {% if chat.sender == request.user %}You{% else %}{{ chat.sender.username }}{% endif %}
+                    </div>
+                    <div style="font-size: 14px; word-break: break-word;">
+                        {{ chat.message }}
+                    </div>
+                    <div style="font-size: 9px; opacity: 0.7; text-align: right; margin-top: 4px;">
+                        {{ chat.timestamp|date:"H:i" }}
+                    </div>
+                </div>
+            {% empty %}
+                <p style="text-align: center; color: #94a3b8; margin: auto; font-size: 13px;">No messages in #{{ room_name }} yet. Say hello!</p>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input Form -->
+        <form method="POST" style="display: flex; gap: 10px;">
+            {% csrf_token %}
+            <input type="text" name="message" placeholder="Type a message in #{{ room_name }}..." required autocomplete="off" style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none;">
+            <button type="submit" style="background: #2563eb; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Send</button>
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+    // Auto scroll chat box to bottom
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock %}
