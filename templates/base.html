@@ -5,24 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}TeamSpace Portal{% endblock %}</title>
     <style>
-        /* Responsive container adjustments */
-        @media (max-width: 768px) {
-            .container[style*="grid-template-columns"] {
-                grid-template-columns: 1fr !important;
-                height: auto !important;
-            }
-        }
-            
-        /* Dashboard grid adjustment for mobile */
-        div[style*="grid-template-columns"] {
-            grid-template-columns: 1fr !important;
-        }
-
-        /* Chat box height adjustment for mobile screens */
-        #chat-box {
-            height: 65vh !important;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -30,24 +12,76 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
-        body {
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh; /* Dynamic mobile viewport height */
             background-color: #f8fafc;
             color: #334155;
-            display: flex;
-            min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 769px) {
+            body {
+                flex-direction: row;
+            }
+        }
+
+        /* Mobile Top Navigation Header */
+        .mobile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ffffff;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        @media (min-width: 769px) {
+            .mobile-header {
+                display: none;
+            }
+        }
+
+        /* Sidebar Styling */
         .sidebar {
-            width: 260px;
+            width: 100%;
             background-color: #ffffff;
             border-right: 1px solid #e2e8f0;
             display: flex;
             flex-direction: column;
             padding: 24px 16px;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
+            z-index: 50;
+        }
+
+        /* Desktop Sidebar Behaviour */
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 260px;
+                position: fixed;
+                height: 100vh;
+                left: 0;
+                top: 0;
+            }
+        }
+
+        /* Mobile Sidebar Drawer Layout */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none; /* Mobile Menu button trigger logic */
+                border-bottom: 1px solid #e2e8f0;
+            }
+            .sidebar.active {
+                display: flex;
+            }
         }
 
         .brand-logo {
@@ -94,17 +128,11 @@
             font-weight: 600;
         }
 
-        /* Admin link highlight style */
         .nav-item.admin-panel-item a {
             color: #4f46e5;
             background-color: #f5f3ff;
             font-weight: 600;
             border: 1px dashed #c7d2fe;
-        }
-
-        .nav-item.admin-panel-item a:hover {
-            background-color: #e0e7ff;
-            color: #3730a3;
         }
 
         .badge {
@@ -121,6 +149,7 @@
 
         .user-profile-section {
             padding-top: 16px;
+            margin-top: 16px;
             border-top: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
@@ -151,19 +180,49 @@
             font-weight: 600;
         }
 
+        /* Main Content Wrapper */
         .main-wrapper {
-            margin-left: 260px;
             flex-grow: 1;
-            padding: 32px;
-            max-width: 1200px;
+            padding: 16px;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        @media (min-width: 769px) {
+            .main-wrapper {
+                margin-left: 260px;
+                padding: 32px;
+                max-width: calc(100% - 260px);
+            }
         }
 
         .container {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 24px;
+            padding: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            height: auto;
+            min-height: 100%;
+        }
+
+        @media (min-width: 769px) {
+            .container {
+                padding: 24px;
+            }
+        }
+
+        /* Generic Mobile Responsive Helpers */
+        @media (max-width: 768px) {
+            div[style*="grid-template-columns"], 
+            .container[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+                height: auto !important;
+            }
+
+            #chat-box {
+                height: 60dvh !important;
+            }
         }
     </style>
     {% block extra_head %}{% endblock %}
@@ -171,13 +230,22 @@
 <body>
 
     {% if user.is_authenticated %}
-    <aside class="sidebar">
+    <!-- Mobile Top Navigation Header -->
+    <header class="mobile-header">
+        <a href="{% url 'inbox' %}" class="brand-logo" style="margin-bottom:0; padding-left:0;">
+            TeamSpace
+        </a>
+        <button id="menu-toggle" style="background:none; border:1px solid #cbd5e1; padding:6px 12px; border-radius:6px; font-weight:600; cursor:pointer; color:#334155;">
+            Menu
+        </button>
+    </header>
+
+    <aside class="sidebar" id="app-sidebar">
         <a href="{% url 'inbox' %}" class="brand-logo">
             TeamSpace
         </a>
 
         <ul class="nav-menu">
-            <!-- Dashboard Link -->
             <li class="nav-item {% if active_tab == 'dashboard' %}active{% endif %}">
                 <a href="{% url 'dashboard' %}" class="nav-link">
                     <span>Dashboard</span>
@@ -237,7 +305,6 @@
                 </a>
             </li>
 
-            <!-- Superuser Admin Panel Access -->
             {% if user.is_superuser %}
             <li class="nav-item admin-panel-item" style="margin-top: auto; margin-bottom: 12px;">
                 <a href="/admin/" target="_blank">
@@ -265,9 +332,20 @@
     </aside>
     {% endif %}
 
-    <main class="main-wrapper" style="{% if not user.is_authenticated %}margin-left: 0; width: 100%;{% endif %}">
+    <main class="main-wrapper" style="{% if not user.is_authenticated %}margin-left: 0; max-width: 100%;{% endif %}">
         {% block content %}{% endblock %}
     </main>
 
+    <script>
+        // Toggle Sidebar on Mobile
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('app-sidebar');
+
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
+    </script>
 </body>
 </html>
