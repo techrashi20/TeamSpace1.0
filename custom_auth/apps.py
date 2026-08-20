@@ -5,4 +5,4 @@ class CustomAuthConfig(AppConfig):
     name = 'custom_auth'
 
     def ready(self):
-        import custom_auth.signals  # Connect signals on app startup
+        import custom_auth.signals  # Connects the signal listener

@@ -6,17 +6,22 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import UserProfile
 
+# Auto-create UserProfile on User creation & force EMPLOYEE role
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
-        # UserProfile create karke default EMPLOYEE role force karein
+        # Create or update profile with default EMPLOYEE role
         profile, _ = UserProfile.objects.get_or_create(user=instance)
-        profile.role = 'EMPLOYEE'
+        
+        # Force default role to EMPLOYEE if not set
+        if not profile.role:
+            profile.role = 'EMPLOYEE'
+            
         profile.save()
     else:
         if hasattr(instance, 'profile'):
             instance.profile.save()
-            
+
 # Send notification email to Superusers when Client or Customer logs in
 @receiver(user_logged_in)
 def notify_superuser_on_client_customer_login(sender, request, user, **kwargs):
