@@ -6,11 +6,22 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import UserProfile
 
-# Auto-create UserProfile on User creation
+# Auto-create UserProfile on User creation & mark as EMPLOYEE / Staff
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance)
+        # Check if created via Django Admin or Superuser without pre-set role
+        profile = UserProfile.objects.create(user=instance)
+        
+        # If user has no specific role assigned yet (default for Superuser created users)
+        if not profile.role:
+            profile.role = 'EMPLOYEE'
+            profile.save()
+
+        # If user is created with staff/superuser privileges, ensure is_staff flag
+        if instance.is_superuser and not instance.is_staff:
+            User.objects.filter(pk=instance.pk).update(is_staff=True)
+
     else:
         if hasattr(instance, 'profile'):
             instance.profile.save()
@@ -40,7 +51,7 @@ def notify_superuser_on_client_customer_login(sender, request, user, **kwargs):
                 send_mail(
                     subject=subject,
                     message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@system.com',
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@system.com'),
                     recipient_list=list(superusers),
                     fail_silently=True,
                 )
