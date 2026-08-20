@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
 from team_audit.views import audit_log_view
+from django.views.generic import RedirectView
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
     path('admin/', admin.site.urls),
     path('auth/', include('custom_auth.urls')),
     path('accounts/', include('custom_auth.urls')),
