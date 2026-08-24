@@ -1,99 +1,93 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ message.subject }} - TeamSpace{% endblock %}
-
-{% block extra_head %}
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-{% endblock %}
+{% block title %}Mail Detail - TeamSpace{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 850px; margin: 0 auto;">
+<!-- Dynamic Theme Style based on Message ID hash/modulo -->
+{% with color_mod=message.id|divisibleby:5 %}
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
     
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
-        <div>
-            <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0 0 6px 0;">
-                {{ message.subject|default:"(No Subject)" }}
-            </h2>
-            <div style="font-size: 13px; color: #64748b;">
-                From: <strong>{{ message.sender.username }}</strong> &bull; {{ message.timestamp|date:"M d, Y H:i" }}
-            </div>
-        </div>
-        <div style="display: flex; gap: 8px;">
-            <a href="{% url 'toggle_archive' message.id %}" style="padding: 6px 12px; background-color: #f1f5f9; color: #334155; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600;">
-                {% if request.user in message.archived_by.all %}Unarchive{% else %}Archive{% endif %}
-            </a>
-            <a href="{% url 'delete_message' message.id %}" style="padding: 6px 12px; background-color: #fee2e2; color: #991b1b; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600;">
-                Delete
-            </a>
-        </div>
+    <!-- Back Button & Actions -->
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'inbox' %}" style="text-decoration: none; color: #2563eb; font-weight: 600; font-size: 14px;">&larr; Back to Inbox</a>
     </div>
 
-    <!-- Message Body -->
-    <div style="font-size: 15px; color: #334155; line-height: 1.6; margin-bottom: 24px; background-color: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #f1f5f9;">
-        {{ message.body|safe }}
-    </div>
-
-    <!-- Message Attachments List -->
-    {% if message.attachments.all %}
-        <div style="margin-bottom: 28px; padding: 16px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h4 style="font-size: 13px; font-weight: 700; color: #374151; margin: 0 0 12px 0;">Attachments ({{ message.attachments.count }})</h4>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                {% for att in message.attachments.all %}
-                    <a href="{{ att.file.url }}" download style="display: inline-flex; align-items: center; gap: 6px; background-color: #eff6ff; color: #1d4ed8; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; border: 1px solid #bfdbfe;">
-                        📄 {{ att.filename }}
-                    </a>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
-
-    <!-- Replies Loop -->
-    {% if replies %}
-        <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">Replies</h3>
-        {% for reply in replies %}
-            <div style="margin-bottom: 16px; padding: 16px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
-                    <strong>{{ reply.sender.username }}</strong> &bull; {{ reply.timestamp|date:"M d, H:i" }}
+    <!-- Main Message Card with Dynamic Themed Background -->
+    <div style="background-color: 
+        {% if message.id|slugify|slice:'-1' == '1' %}#eff6ff
+        {% elif message.id|slugify|slice:'-1' == '2' %}#f0fdf4
+        {% elif message.id|slugify|slice:'-1' == '3' %}#fdf4ff
+        {% elif message.id|slugify|slice:'-1' == '4' %}#fffbeb
+        {% else %}#f8fafc{% endif %}; 
+        border: 1px solid #cbd5e1; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 24px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
+            <div>
+                <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0 0 6px 0;">{{ message.subject }}</h2>
+                <div style="font-size: 13px; color: #64748b;">
+                    From: <strong style="color: #334155;">{{ message.sender.username }}</strong> 
+                    &bull; To: 
+                    {% for rec in message.recipients.all %}
+                        <span style="color: #334155; font-weight: 500;">{{ rec.username }}</span>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
                 </div>
-                <div style="font-size: 14px; color: #334155;">{{ reply.body|safe }}</div>
-                {% if reply.attachments.all %}
-                    <div style="margin-top: 10px; display: flex; gap: 8px;">
-                        {% for att in reply.attachments.all %}
-                            <a href="{{ att.file.url }}" download style="font-size: 12px; color: #2563eb; text-decoration: none;">📎 {{ att.filename }}</a>
-                        {% endfor %}
-                    </div>
-                {% endif %}
             </div>
-        {% endfor %}
-    {% endif %}
+            <div style="font-size: 12px; color: #94a3b8;">
+                {{ message.timestamp|date:"M d, Y H:i" }}
+            </div>
+        </div>
 
-    <!-- Reply Box -->
-    <div style="margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-        <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0 0 12px 0;">Reply</h4>
+        <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-wrap; margin-bottom: 20px;">
+            {{ message.body }}
+        </div>
+
+        <!-- Attachments if any -->
+        {% if message.attachments.all %}
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 16px;">
+                <span style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 6px;">Attachments:</span>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    {% for att in message.attachments.all %}
+                        <a href="{{ att.file.url }}" target="_blank" style="font-size: 12px; background: #ffffff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; color: #2563eb; text-decoration: none;">
+                            📎 Download File
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Thread Replies Section -->
+    <h3 style="font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 16px;">Conversation Replies</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+        {% for reply in replies %}
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <strong style="font-size: 13px; color: #1e293b;">{{ reply.sender.username }}</strong>
+                    <span style="font-size: 11px; color: #94a3b8;">{{ reply.timestamp|date:"M d, Y H:i" }}</span>
+                </div>
+                <p style="font-size: 13px; color: #475569; margin: 0; white-space: pre-wrap;">{{ reply.body }}</p>
+            </div>
+        {% empty %}
+            <p style="font-size: 13px; color: #94a3b8; font-style: italic;">No replies yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Reply Form Box -->
+    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 20px;">
+        <h4 style="font-size: 14px; font-weight: 600; color: #1e293b; margin-top: 0; margin-bottom: 12px;">Post a Reply</h4>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div style="margin-bottom: 12px;">
-                <div id="replyEditor" style="height: 120px; background: #ffffff;"></div>
-                <input type="hidden" name="body" id="replyBody">
+                <textarea name="body" rows="4" placeholder="Type your reply here..." required style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-size: 13px; font-family: inherit; box-sizing: border-box;"></textarea>
             </div>
-            <div style="margin-bottom: 16px;">
-                <input type="file" name="attachments" multiple style="font-size: 13px; color: #4b5563;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <input type="file" name="attachments" multiple style="font-size: 12px; color: #64748b;">
+                <button type="submit" style="background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Send Reply</button>
             </div>
-            <button type="submit" onclick="document.getElementById('replyBody').value = replyQuill.root.innerHTML"
-                style="background-color: #4f46e5; color: #ffffff; border: none; padding: 9px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
-                Send Reply
-            </button>
         </form>
     </div>
 
 </div>
-
-<script>
-    var replyQuill = new Quill('#replyEditor', {
-        theme: 'snow',
-        placeholder: 'Type your reply...',
-        modules: { toolbar: [['bold', 'italic'], ['link']] }
-    });
-</script>
+{% endwith %}
 {% endblock %}
