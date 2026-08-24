@@ -192,22 +192,28 @@ def mail_detail_view(request, pk):
                 body=reply_body,
                 parent=message
             )
-            reply_msg.recipients.add(message.sender)
+            recipients_to_notify = set(message.recipients.exclude(id=request.user.id))
+            if message.sender != request.user:
+                recipients_to_notify.add(message.sender)
+
+            reply_msg.recipients.set(recipients_to_notify)
+            
             for file in reply_files:
                 Attachment.objects.create(message=reply_msg, file=file)
             
-            # <--- ALSO CREATE NOTIFICATION FOR REPLY RECIPIENT --->
-            Notification.objects.create(
-                user=message.sender,
-                title=f"New Reply from {request.user.username}",
-                message=f"Re: {message.subject}",
-                url=f"/mailbox/mail/{pk}/",
-                is_read=False
-            )
+            # Create a notification for each recipient of the reply
+            for recipient in recipients_to_notify:
+                Notification.objects.create(
+                    user=recipient,
+                    title=f"New Reply from {request.user.username}",
+                    message=f"Re: {message.subject}",
+                    url=f"/mailbox/mail/{message.pk}/",
+                    is_read=False
+                )
 
             messages.success(request, "Reply sent successfully!")
             return redirect('message_detail', pk=pk)
-
+            
     replies = message.replies.all().order_by('timestamp')
     return render(request, 'team_mailbox/detail.html', {
         'message': message, 
