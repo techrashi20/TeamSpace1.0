@@ -21,6 +21,10 @@ def mark_notification_read(request, pk):
         return redirect(notif.link)
     return redirect('notifications_list')
 
+@login_required
+def notifications_count_api(request):
+    count = Notification.objects.filter(user=request.user, is_read=False).count()
+    return JsonResponse({'unread_count': count})
 
 @login_required
 def mark_all_read_api(request):
