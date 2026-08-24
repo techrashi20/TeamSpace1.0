@@ -3,15 +3,8 @@
 {% block title %}{{ room.name }} - TeamChat{% endblock %}
 
 {% block content %}
-<!-- Dynamic Theme Wrapper based on Room Name/Slug string length/characters -->
-<div style="background-color: 
-    {% with name_len=room.name|length %}
-        {% if name_len|divisibleby:4 %}#eff6ff !important
-        {% elif name_len|divisibleby:3 %}#f0fdf4 !important
-        {% elif name_len|divisibleby:2 %}#fdf4ff !important
-        {% else %}#fffbeb !important{% endif %}
-    {% endwith %}; 
-    min-height: calc(100vh - 60px); padding: 20px; box-sizing: border-box;">
+<!-- Safe Container Wrapper -->
+<div style="min-height: calc(100vh - 60px); padding: 20px; box-sizing: border-box;">
 
     <div class="container-fluid" style="max-width: 1200px; margin: 0 auto;">
         <div class="row" style="display: flex; gap: 20px;">
