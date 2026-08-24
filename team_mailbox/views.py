@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from .models import Message, Attachment
 from custom_auth.models import ClientEmployeeAccess
+from team_notifications.models import Notification  # <--- IMPORTED NOTIFICATION MODEL
 
 
 def get_allowed_recipients(user):
@@ -145,8 +146,20 @@ def compose_view(request, draft_id=None):
             msg.is_draft = False
             msg.save()
             msg.recipients.set(recipients_ids)
+            
             for file in uploaded_files:
                 Attachment.objects.create(message=msg, file=file)
+
+            # <--- AUTOMATICALLY CREATE NOTIFICATIONS FOR RECIPIENTS --->
+            for recipient in msg.recipients.all():
+                Notification.objects.create(
+                    user=recipient,
+                    title=f"New Mail from {request.user.username}",
+                    message=subject if subject else "No Subject",
+                    url=f"/mailbox/inbox/",
+                    is_read=False
+                )
+
             messages.success(request, "Mail sent successfully!")
             return redirect('inbox')
 
@@ -182,6 +195,16 @@ def mail_detail_view(request, pk):
             reply_msg.recipients.add(message.sender)
             for file in reply_files:
                 Attachment.objects.create(message=reply_msg, file=file)
+            
+            # <--- ALSO CREATE NOTIFICATION FOR REPLY RECIPIENT --->
+            Notification.objects.create(
+                user=message.sender,
+                title=f"New Reply from {request.user.username}",
+                message=f"Re: {message.subject}",
+                url=f"/mailbox/mail/{pk}/",
+                is_read=False
+            )
+
             messages.success(request, "Reply sent successfully!")
             return redirect('message_detail', pk=pk)
 
