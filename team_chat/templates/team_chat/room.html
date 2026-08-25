@@ -3,8 +3,8 @@
 {% block title %}{{ room.name }} - TeamChat{% endblock %}
 
 {% block content %}
-<div style="min-height: calc(100vh - 60px); padding: 20px; box-sizing: border-box; background: #f8fafc;">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; height: calc(100vh - 100px);">
+<div style="padding: 0; box-sizing: border-box; background: #f8fafc; width: 100%;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; height: calc(100vh - 120px); min-height: 500px;">
         
         <!-- Left Sidebar: Room List -->
         <div style="width: 280px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
@@ -13,7 +13,7 @@
             </div>
             <div style="overflow-y: auto; display: flex; flex-direction: column; gap: 5px; flex: 1;">
                 {% for r in rooms %}
-                    <a href="{% url 'chat_room' r.id %}" style="display: block; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: {% if r == room %}#2563eb{% else %}#334155{% endif %}; background: {% if r == room %}#eff6ff{% else %}transparent{% endif %}; font-weight: {% if r == room %}600{% else %}400{% endif %}; font-size: 14px;">
+                    <a href="{% url 'chat_room' r.id %}" style="display: block; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: {% if r.id == room.id %}#2563eb{% else %}#334155{% endif %}; background: {% if r.id == room.id %}#eff6ff{% else %}transparent{% endif %}; font-weight: {% if r.id == room.id %}600{% else %}400{% endif %}; font-size: 14px;">
                         # {{ r.name }}
                     </a>
                 {% endfor %}
