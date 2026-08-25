@@ -3,23 +3,15 @@
 {% block title %}Mail Detail - TeamSpace{% endblock %}
 
 {% block content %}
-<!-- Dynamic Theme Style based on Message ID hash/modulo -->
-{% with color_mod=message.id|divisibleby:5 %}
-<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 0;">
     
     <!-- Back Button & Actions -->
     <div style="margin-bottom: 20px;">
         <a href="{% url 'inbox' %}" style="text-decoration: none; color: #2563eb; font-weight: 600; font-size: 14px;">&larr; Back to Inbox</a>
     </div>
 
-    <!-- Main Message Card with Dynamic Themed Background -->
-    <div style="background-color: 
-        {% if message.id|slugify|slice:'-1' == '1' %}#eff6ff
-        {% elif message.id|slugify|slice:'-1' == '2' %}#f0fdf4
-        {% elif message.id|slugify|slice:'-1' == '3' %}#fdf4ff
-        {% elif message.id|slugify|slice:'-1' == '4' %}#fffbeb
-        {% else %}#f8fafc{% endif %}; 
-        border: 1px solid #cbd5e1; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 24px;">
+    <!-- Main Message Card -->
+    <div style="background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 24px;">
         
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
             <div>
@@ -38,7 +30,7 @@
         </div>
 
         <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-wrap; margin-bottom: 20px;">
-            {{ message.body }}
+            {{ message.body|safe }}
         </div>
 
         <!-- Attachments if any -->
@@ -89,5 +81,4 @@
     </div>
 
 </div>
-{% endwith %}
 {% endblock %}
