@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="bg-white p-6 rounded-lg shadow-sm">
-    <h1 class="text-2xl font-bold text-gray-800 mb-4">Drafts</h1>
-    <div class="space-y-2">
+<div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    <h1 style="font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">Drafts</h1>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
         {% for draft in drafts %}
-            <div class="flex justify-between items-center border p-3 rounded hover:bg-gray-50">
+            <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 8px; background: #ffffff;">
                 <div>
-                    <a href="{% url 'edit_draft' draft.id %}" class="font-semibold text-indigo-600 hover:underline">{{ draft.subject }}</a>
-                    <p class="text-xs text-gray-500">{{ draft.body|truncatewords:10 }}</p>
+                    <a href="{% url 'edit_draft' draft.id %}" style="font-weight: 600; color: #4f46e5; text-decoration: none;">{{ draft.subject|default:"(No Subject)" }}</a>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 4px;">{{ draft.body|striptags|truncatewords:10 }}</p>
                 </div>
-                <span class="text-xs text-gray-400">{{ draft.timestamp|date:"M d, H:i" }}</span>
+                <span style="font-size: 12px; color: #94a3b8;">{{ draft.timestamp|date:"M d, H:i" }}</span>
             </div>
         {% empty %}
-            <p class="text-gray-500 text-sm">No saved drafts.</p>
+            <p style="color: #64748b; font-size: 13px; font-style: italic;">No saved drafts.</p>
         {% endfor %}
     </div>
 </div>
