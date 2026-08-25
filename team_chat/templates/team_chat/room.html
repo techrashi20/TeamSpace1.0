@@ -3,66 +3,60 @@
 {% block title %}{{ room.name }} - TeamChat{% endblock %}
 
 {% block content %}
-<!-- Safe Container Wrapper -->
-<div style="min-height: calc(100vh - 60px); padding: 20px; box-sizing: border-box;">
+<div style="min-height: calc(100vh - 60px); padding: 20px; box-sizing: border-box; background: #f8fafc;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; height: calc(100vh - 100px);">
+        
+        <!-- Left Sidebar: Room List -->
+        <div style="width: 280px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="margin-bottom: 15px;">
+                <input type="text" placeholder="Search rooms..." style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; box-sizing: border-box;">
+            </div>
+            <div style="overflow-y: auto; display: flex; flex-direction: column; gap: 5px; flex: 1;">
+                {% for r in rooms %}
+                    <a href="{% url 'chat_room' r.id %}" style="display: block; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: {% if r == room %}#2563eb{% else %}#334155{% endif %}; background: {% if r == room %}#eff6ff{% else %}transparent{% endif %}; font-weight: {% if r == room %}600{% else %}400{% endif %}; font-size: 14px;">
+                        # {{ r.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
 
-    <div class="container-fluid" style="max-width: 1200px; margin: 0 auto;">
-        <div class="row" style="display: flex; gap: 20px;">
+        <!-- Right Main Area: Active Chat Room -->
+        <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
             
-            <!-- Left Sidebar: Room List -->
-            <div style="width: 280px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; height: calc(100vh - 120px); overflow-y: auto;">
-                <div style="margin-bottom: 15px;">
-                    <input type="text" placeholder="Search rooms..." style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; box-sizing: border-box;">
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                    {% for r in rooms %}
-                        <a href="{% url 'chat_room' r.id %}" style="display: block; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: {% if r == room %}#2563eb{% else %}#334155{% endif %}; background: {% if r == room %}#eff6ff{% else %}transparent{% endif %}; font-weight: {% if r == room %}600{% else %}400{% endif %}; font-size: 14px;">
-                            # {{ r.name }}
-                        </a>
-                    {% endfor %}
-                </div>
+            <!-- Room Header -->
+            <div style="padding: 15px 20px; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
+                <h2 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">{{ room.name }}</h2>
+                <span style="font-size: 12px; color: #64748b;">Active Team Chat Room</span>
             </div>
 
-            <!-- Right Main Area: Active Chat Room -->
-            <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; flex-direction: column; height: calc(100vh - 120px);">
-                
-                <!-- Room Header -->
-                <div style="padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h2 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">{{ room.name }}</h2>
-                        <span style="font-size: 12px; color: #64748b;">Active Team Chat Room</span>
+            <!-- Messages Feed Box -->
+            <div id="chat-messages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #ffffff;">
+                {% for message in messages %}
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 14px; border-radius: 8px; max-width: 75%;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px;">
+                            <strong style="color: #2563eb;">{{ message.sender.username }}</strong>
+                            <span style="color: #94a3b8;">{{ message.timestamp|date:"H:i" }}</span>
+                        </div>
+                        <p style="margin: 0; font-size: 13px; color: #334155; word-break: break-word;">{{ message.content }}</p>
                     </div>
-                </div>
+                {% empty %}
+                    <div style="margin: auto; text-align: center; color: #94a3b8; font-style: italic; font-size: 14px;">
+                        No messages in #{{ room.name }} yet. Start the conversation below!
+                    </div>
+                {% endfor %}
+            </div>
 
-                <!-- Messages Feed Box -->
-                <div id="chat-messages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: rgba(255, 255, 255, 0.5);">
-                    {% for message in messages %}
-                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 14px; border-radius: 8px; max-width: 75%;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px;">
-                                <strong style="color: #2563eb;">{{ message.sender.username }}</strong>
-                                <span style="color: #94a3b8;">{{ message.timestamp|date:"H:i" }}</span>
-                            </div>
-                            <p style="margin: 0; font-size: 13px; color: #334155; word-break: break-word;">{{ message.content }}</p>
-                        </div>
-                    {% empty %}
-                        <div style="margin: auto; text-align: center; color: #94a3b8; font-style: italic; font-size: 14px;">
-                            No messages in #{{ room.name }} yet. Start the conversation below!
-                        </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Message Input Form -->
-                <div style="padding: 15px 20px; border-top: 1px solid #e2e8f0; background: #ffffff; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
-                    <form id="chat-form" method="POST" style="display: flex; gap: 10px;">
-                        {% csrf_token %}
-                        <input type="text" id="chat-message-input" name="content" placeholder="Message #{{ room.name }}..." autocomplete="off" required style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none;">
-                        <button type="submit" style="background: #2563eb; color: #fff; border: none; padding: 0 20px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;">Send</button>
-                    </form>
-                </div>
-
+            <!-- Message Input Form -->
+            <div style="padding: 15px 20px; border-top: 1px solid #e2e8f0; background: #ffffff;">
+                <form id="chat-form" method="POST" style="display: flex; gap: 10px;">
+                    {% csrf_token %}
+                    <input type="text" id="chat-message-input" name="content" placeholder="Message #{{ room.name }}..." autocomplete="off" required style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none;">
+                    <button type="submit" style="background: #2563eb; color: #fff; border: none; padding: 0 20px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;">Send</button>
+                </form>
             </div>
 
         </div>
+
     </div>
 </div>
 {% endblock %}
