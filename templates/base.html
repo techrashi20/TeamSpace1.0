@@ -9,13 +9,12 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         html, body {
             width: 100%;
             min-height: 100vh;
-            min-height: 100dvh;
             background-color: #f8fafc;
             color: #334155;
             overflow-x: hidden;
@@ -32,7 +31,6 @@
             }
         }
 
-        /* Mobile Top Navigation Header */
         .mobile-header {
             display: flex;
             align-items: center;
@@ -46,12 +44,9 @@
         }
 
         @media (min-width: 769px) {
-            .mobile-header {
-                display: none;
-            }
+            .mobile-header { display: none; }
         }
 
-        /* Sidebar Styling */
         .sidebar {
             width: 100%;
             background-color: #ffffff;
@@ -62,7 +57,6 @@
             z-index: 50;
         }
 
-        /* Desktop Sidebar Behaviour */
         @media (min-width: 769px) {
             .sidebar {
                 width: 260px;
@@ -73,11 +67,9 @@
             }
         }
 
-        /* Mobile Sidebar Drawer Layout */
         @media (max-width: 768px) {
             .sidebar {
                 display: none;
-                border-bottom: 1px solid #e2e8f0;
             }
             .sidebar.active {
                 display: flex;
@@ -93,7 +85,6 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
         }
 
         .nav-menu {
@@ -114,7 +105,6 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            transition: all 0.2s ease;
         }
 
         .nav-item a:hover {
@@ -128,64 +118,10 @@
             font-weight: 600;
         }
 
-        .nav-item.admin-panel-item a {
-            color: #4f46e5;
-            background-color: #f5f3ff;
-            font-weight: 600;
-            border: 1px dashed #c7d2fe;
-        }
-
-        .badge {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            color: #ffffff;
-        }
-
-        .badge-inbox { background-color: #ef4444; }
-        .badge-tasks { background-color: #f59e0b; }
-        .badge-notifications { background-color: #6366f1; }
-
-        .user-profile-section {
-            padding-top: 16px;
-            margin-top: 16px;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .user-role {
-            font-size: 12px;
-            color: #64748b;
-            text-transform: capitalize;
-        }
-
-        .logout-btn {
-            font-size: 13px;
-            color: #ef4444;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        /* Main Content Wrapper */
         .main-wrapper {
             flex-grow: 1;
             padding: 16px;
             width: 100%;
-            min-height: 100vh;
         }
 
         @media (min-width: 769px) {
@@ -196,32 +132,13 @@
             }
         }
 
-        /* Authentication Layout (Unauthenticated Pages Centering) */
-        .main-wrapper.auth-wrapper {
-            margin-left: 0 !important;
-            max-width: 100% !important;
+        .user-profile-section {
+            padding-top: 16px;
+            margin-top: 16px;
+            border-top: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            min-height: 100dvh;
-            padding: 20px;
-        }
-
-        .container {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            height: auto;
-            min-height: 100%;
-        }
-
-        @media (min-width: 769px) {
-            .container {
-                padding: 24px;
-            }
+            justify-content: space-between;
         }
     </style>
     {% block extra_head %}{% endblock %}
@@ -229,116 +146,38 @@
 <body>
 
     {% if user.is_authenticated %}
-    <!-- Mobile Top Navigation Header -->
     <header class="mobile-header">
-        <a href="{% url 'inbox' %}" class="brand-logo" style="margin-bottom:0; padding-left:0;">
-            TeamSpace
-        </a>
-        <button id="menu-toggle" style="background:none; border:1px solid #cbd5e1; padding:6px 12px; border-radius:6px; font-weight:600; cursor:pointer; color:#334155;">
-            Menu
-        </button>
+        <a href="{% url 'inbox' %}" class="brand-logo" style="margin-bottom:0;">TeamSpace</a>
+        <button id="menu-toggle" style="background:none; border:1px solid #cbd5e1; padding:6px 12px; border-radius:6px; font-weight:600; cursor:pointer;">Menu</button>
     </header>
 
     <aside class="sidebar" id="app-sidebar">
-        <a href="{% url 'inbox' %}" class="brand-logo">
-            TeamSpace
-        </a>
-
+        <a href="{% url 'inbox' %}" class="brand-logo">TeamSpace</a>
         <ul class="nav-menu">
             <li class="nav-item {% if active_tab == 'dashboard' %}active{% endif %}">
-                <a href="{% url 'dashboard' %}" class="nav-link">
-                    <span>Dashboard</span>
-                </a>
+                <a href="{% url 'dashboard' %}"><span>Dashboard</span></a>
             </li>
             <li class="nav-item {% if active_tab == 'inbox' %}active{% endif %}">
-                <a href="{% url 'inbox' %}">
-                    <span>Inbox</span>
-                    {% if unread_inbox_count %}
-                        <span class="badge badge-inbox">{{ unread_inbox_count }}</span>
-                    {% endif %}
-                </a>
-            </li>
-
-            <li class="nav-item {% if active_tab == 'sent' %}active{% endif %}">
-                <a href="{% url 'sent' %}">
-                    <span>Sent</span>
-                </a>
-            </li>
-
-            <li class="nav-item {% if active_tab == 'drafts' %}active{% endif %}">
-                <a href="{% url 'drafts' %}">
-                    <span>Drafts</span>
-                </a>
-            </li>
-
-            <li class="nav-item {% if active_tab == 'archive' %}active{% endif %}">
-                <a href="{% url 'archive' %}">
-                    <span>Archive</span>
-                </a>
-            </li>
-            
-            <li class="nav-item">
-                <a href="{% url 'task_board' %}">
-                    <span>Tasks</span>
-                    {% if unread_tasks_count %}
-                        <span class="badge badge-tasks">{{ unread_tasks_count }}</span>
-                    {% endif %}
-                </a>
+                <a href="{% url 'inbox' %}"><span>Inbox</span></a>
             </li>
             <li class="nav-item {% if active_tab == 'chat' %}active{% endif %}">
-                <a href="{% url 'chat_main' %}">
-                    <span>Team Chat</span>
-                </a>
+                <a href="{% url 'chat_main' %}"><span>Team Chat</span></a>
             </li>
-            <li class="nav-item">
-                <a href="{% url 'notifications_list' %}">
-                    <span>Notifications</span>
-                    {% if unread_notifications_count %}
-                        <span class="badge badge-notifications">{{ unread_notifications_count }}</span>
-                    {% endif %}
-                </a>
-            </li>
-            <li class="nav-item {% if active_tab == 'calendar' %}active{% endif %}">
-                <a href="{% url 'task_calendar' %}">
-                    <span>Calendar</span>
-                </a>
-            </li>
-
-            {% if user.is_superuser %}
-            <li class="nav-item admin-panel-item" style="margin-top: auto; margin-bottom: 12px;">
-                <a href="/admin/" target="_blank">
-                    <span>Admin Panel</span>
-                </a>
-            </li>
-            {% endif %}
         </ul>
-
         <div class="user-profile-section">
-            <div class="user-info">
-                <span class="user-name">{{ user.username }}</span>
-                <span class="user-role">
-                    {% if user.is_superuser %}
-                        Super Admin
-                    {% elif user.profile %}
-                        {{ user.profile.get_role_display }}
-                    {% else %}
-                        Member
-                    {% endif %}
-                </span>
-            </div>
-            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            <span style="font-weight: 600; font-size: 14px;">{{ user.username }}</span>
+            <a href="{% url 'logout' %}" style="color: #ef4444; font-size: 13px; text-decoration: none; font-weight: 600;">Logout</a>
         </div>
     </aside>
     {% endif %}
 
-    <main class="main-wrapper {% if not user.is_authenticated %}auth-wrapper{% endif %}">
+    <main class="main-wrapper">
         {% block content %}{% endblock %}
     </main>
 
     <script>
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('app-sidebar');
-
         if (menuToggle && sidebar) {
             menuToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('active');
