@@ -3,7 +3,7 @@
 {% block title %}{{ title|default:"Inbox" }} - TeamSpace{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container" style="max-width: 100%;">
     
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
         <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">
@@ -23,7 +23,7 @@
         {% endfor %}
     {% endif %}
 
-    <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+    <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #ffffff;">
         
         {% for msg in messages %}
             <div style="border-bottom: 1px solid #f1f5f9; background-color: {% if not msg.is_read and active_tab == 'inbox' %}#f0fdf4{% else %}#ffffff{% endif %};">
